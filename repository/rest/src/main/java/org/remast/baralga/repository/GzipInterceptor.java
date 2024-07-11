@@ -9,14 +9,15 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.GzipSource;
 import okio.Okio;
-
 public class GzipInterceptor implements Interceptor {
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Request.Builder newRequest = chain.request().newBuilder();
-        newRequest.addHeader("Accept-Encoding", "gzip");
-        Response response = chain.proceed(newRequest.build());
+        Request originalRequest = chain.request();
+        Request.Builder newRequestBuilder = originalRequest.newBuilder()
+                .addHeader("Accept-Encoding", "gzip");
+
+        Response response = chain.proceed(newRequestBuilder.build());
 
         if (isGzipped(response)) {
             return unzip(response);
@@ -25,8 +26,7 @@ public class GzipInterceptor implements Interceptor {
         }
     }
 
-    private Response unzip(final Response response) throws IOException {
-
+    private Response unzip(Response response) throws IOException {
         if (response.body() == null) {
             return response;
         }
@@ -34,21 +34,21 @@ public class GzipInterceptor implements Interceptor {
         GzipSource gzipSource = new GzipSource(response.body().source());
         String bodyString = Okio.buffer(gzipSource).readUtf8();
 
-        ResponseBody responseBody = ResponseBody.create(bodyString, response.body().contentType());
-
         Headers strippedHeaders = response.headers().newBuilder()
                 .removeAll("Content-Encoding")
                 .removeAll("Content-Length")
                 .build();
+
+        ResponseBody responseBody = ResponseBody.create(bodyString, response.body().contentType());
+
         return response.newBuilder()
                 .headers(strippedHeaders)
                 .body(responseBody)
-                .message(response.message())
                 .build();
-
     }
 
-    private Boolean isGzipped(Response response) {
-        return response.header("Content-Encoding") != null && response.header("Content-Encoding").equals("gzip");
+    private boolean isGzipped(Response response) {
+        String contentEncoding = response.header("Content-Encoding");
+        return contentEncoding != null && contentEncoding.equalsIgnoreCase("gzip");
     }
 }
