@@ -27,11 +27,27 @@ public class ActivityVO {
     }
 
     public ActivityVO(final String id, final DateTime start, final DateTime end, final String description, final ProjectVO project) {
-        this.id = id;
-        this.start = start;
-        this.end = end;
-        this.description = description;
-        this.project = project;
+        this(createParams(id, start, end, description, project));
+    }
+
+    // Private constructor that takes a Params object
+    private ActivityVO(final Params params) {
+        this.id = params.id;
+        this.start = params.start;
+        this.end = params.end;
+        this.description = params.description;
+        this.project = params.project;
+    }
+
+    // Method to create a Params object
+    private static Params createParams(final String id, final DateTime start, final DateTime end, final String description, final ProjectVO project) {
+        Params params = new Params();
+        params.id = id;
+        params.start = start;
+        params.end = end;
+        params.description = description;
+        params.project = project;
+        return params;
     }
 
     // Getter and Setter methods
@@ -73,5 +89,14 @@ public class ActivityVO {
 
     public void setProject(ProjectVO project) {
         this.project = project;
+    }
+
+    // Inner static class for encapsulating parameters
+    private static class Params {
+        private String id;
+        private DateTime start;
+        private DateTime end;
+        private String description;
+        private ProjectVO project;
     }
 }
