@@ -22,6 +22,10 @@ public class ActivityVO {
         this(null, start, end, null, project);
     }
 
+    public ActivityVO(final String id, final DateTime start, final DateTime end, final ProjectVO project) {
+        this(id, start, end, null, project);
+    }
+
     public ActivityVO(final String id, final DateTime start, final DateTime end, final String description, final ProjectVO project) {
         this.id = id;
         this.start = start;
@@ -30,6 +34,7 @@ public class ActivityVO {
         this.project = project;
     }
 
+    // Getter and Setter methods
     public String getId() {
         return id;
     }
@@ -69,5 +74,4 @@ public class ActivityVO {
     public void setProject(ProjectVO project) {
         this.project = project;
     }
-
 }
